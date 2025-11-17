@@ -1,15 +1,22 @@
 package producto.productos.repository;
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class ProductoRepository {
+import producto.productos.model.Producto;
 
-    @Query(value = "SELECT * FROM Producto WHERE LOWER(nombre) = LOWER(:nombre)", nativeQuery = true)
-    List<Producto> findByNombre(@Param("nombre") String nombre);
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+@Repository
+public interface ProductoRepository extends JpaRepository<Producto, Long> {
     
+    Optional<Producto> findBySku(String sku);
+
+    boolean existsBySku(String sku);
+
+    Page<Producto> findByNombreContainingIgnoreCase(String nombre, Pageable pageable);
+
+    Page<Producto> findByDestacado(boolean destacado, Pageable pageable);
 }

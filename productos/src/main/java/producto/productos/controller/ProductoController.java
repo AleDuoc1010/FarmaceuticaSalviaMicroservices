@@ -1,5 +1,6 @@
 package producto.productos.controller;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class ProductoController {
     @Operation(summary = "Obtener todos los productos", description = "Obtiene una lista paginada de todos los productos")
     @ApiResponse(responseCode = "200", description = "Productos obtenidos exitosamente")
     @GetMapping
-    public ResponseEntity<Page<ProductoResponseDto>> getAllProductos(Pageable pageable){
+    public ResponseEntity<Page<ProductoResponseDto>> getAllProductos(@ParameterObject Pageable pageable){
         Page<ProductoResponseDto> pagina = productoService.findAll(pageable);
         return ResponseEntity.ok(pagina);
     }
@@ -62,7 +63,7 @@ public class ProductoController {
     @Operation(summary = "Obtener productos destacados", description = "Obtiene una lista paginada de productos destacados")
     @ApiResponse(responseCode = "200", description = "Productos destacados obtenidos exitosamente")
     @GetMapping("/destacados")
-    public ResponseEntity<Page<ProductoResponseDto>> getProductosDestacados(Pageable pageable){
+    public ResponseEntity<Page<ProductoResponseDto>> getProductosDestacados(@ParameterObject Pageable pageable){
         Page<ProductoResponseDto> pagina = productoService.findDestacados(pageable);
         return ResponseEntity.ok(pagina);
     }

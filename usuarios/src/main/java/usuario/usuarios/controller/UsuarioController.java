@@ -1,5 +1,6 @@
 package usuario.usuarios.controller;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -82,7 +83,7 @@ public class UsuarioController {
     @Operation(summary = "Obtener todos los usuarios")
     @ApiResponse(responseCode = "200", description = "Lista de usuarios")
     @GetMapping
-    public ResponseEntity<Page<UsuarioResponseDto>> getAllUsuarios(Pageable pageable){
+    public ResponseEntity<Page<UsuarioResponseDto>> getAllUsuarios(@ParameterObject Pageable pageable){
 
         Page<Usuario> paginaUsuarios = usuarioService.findAll(pageable);
 

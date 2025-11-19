@@ -82,6 +82,15 @@ public class PedidoService {
         .orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public List<PedidoResponseDto> obtenerHistorial(String usuarioUuid){
+        List<Pedido> pedidosPagados = pedidoRepository.findAllByUsuarioUuidAndEstado(usuarioUuid, Estado.PAGADO);
+
+        return pedidosPagados.stream()
+        .map(this::mapToDto)
+        .collect(Collectors.toList());
+    }
+
     @Transactional
     public PedidoResponseDto pagarCarrito(String usuarioUuid){
 
@@ -100,6 +109,37 @@ public class PedidoService {
         Pedido pedidoPagado = pedidoRepository.save(pedido);
 
         return mapToDto(pedidoPagado);
+    }
+
+    @Transactional
+    public PedidoResponseDto comprarArticuloDirecto(String usuarioUuid, AgregarItemDto dto) {
+
+        InventarioExternoDto stockInfo = inventarioClient.obtenerStock(dto.sku());
+        if(stockInfo.cantidad() < dto.cantidad()){
+            throw new StockInsuficienteException("Stock insuficiente. Disponible: " + stockInfo.cantidad());
+        }
+
+        ProductoExternoDto productoInfo = catalogoClient.getProductoBySku(dto.sku());
+
+        Pedido pedido = new Pedido();
+        pedido.setUsuarioUuid(usuarioUuid);
+        pedido.setEstado(Estado.PAGADO);
+
+        ItemsPedido item = new ItemsPedido();
+        item.setPedido(pedido);
+        item.setSkuProducto(dto.sku());
+        item.setCantidad(dto.cantidad());
+        item.setPrecioUnitario(productoInfo.precio());
+
+        pedido.getItems().add(item);
+
+        calcularTotal(pedido);
+
+        inventarioClient.reducirStock(dto.sku(), dto.cantidad());
+
+        Pedido pedidoGuardado = pedidoRepository.save(pedido);
+
+        return mapToDto(pedidoGuardado);
     }
 
     @Transactional

@@ -46,6 +46,10 @@ public class Producto {
     @Schema(description = "URL de la Imagen del producto", example = "http://example.com/imagen.jpg")
     private String imagenUrl;
 
+    @Column(name = "pide_receta", nullable = false)
+    @Schema(description = "Indica si el producto requiere receta médica")
+    private boolean pideReceta = false;
+
     @Column(nullable = false)
     @Schema(description = "Indica si el producto es destacado", example = "true")
     private boolean destacado = false;

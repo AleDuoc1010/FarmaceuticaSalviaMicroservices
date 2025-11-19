@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/productos").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.DELETE, "/productos/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/imagenes/**").permitAll()
 
                 .anyRequest().authenticated()
             )

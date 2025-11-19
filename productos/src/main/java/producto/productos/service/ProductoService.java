@@ -29,6 +29,7 @@ public class ProductoService {
             producto.getPrecio(),
             producto.getImagenUrl(),
             producto.isDestacado(),
+            producto.isPideReceta(),
             producto.getFechaCreacion()
         );
     }
@@ -47,6 +48,7 @@ public class ProductoService {
         nuevoProducto.setPrecio(createDto.precio());
         nuevoProducto.setImagenUrl(createDto.imagenUrl());
         nuevoProducto.setDestacado(createDto.destacado());
+        nuevoProducto.setPideReceta(createDto.pideReceta());
 
         Producto productoGuardado = productoRepository.save(nuevoProducto);
         return mapToResponseDto(productoGuardado);

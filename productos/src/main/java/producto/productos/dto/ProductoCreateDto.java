@@ -28,6 +28,10 @@ public record ProductoCreateDto(
     @Schema(description = "Indica si el producto es destacado", example = "true")
     boolean destacado,
 
+    @NotNull
+    @Schema(description = "Indica si requiere receta médica")
+    Boolean pideReceta,
+
     @Schema(description = "URL de la imagen del producto", example = "http://example.com/images/paracetamol.jpg")
     String imagenUrl
 ){}

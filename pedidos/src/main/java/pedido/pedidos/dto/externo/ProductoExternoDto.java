@@ -7,5 +7,6 @@ public record ProductoExternoDto(
     String nombre,
     String descripcion,
     BigDecimal precio,
+    boolean pideReceta,
     String imagenUrl
 ) {}

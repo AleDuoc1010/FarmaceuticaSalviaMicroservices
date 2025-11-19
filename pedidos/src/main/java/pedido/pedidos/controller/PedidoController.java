@@ -1,5 +1,7 @@
 package pedido.pedidos.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -46,11 +48,28 @@ public class PedidoController {
         return ResponseEntity.ok(carrito);
     }
 
+    @GetMapping("/historial")
+    @Operation(summary = "Ver Historial de compras")
+    public ResponseEntity<List<PedidoResponseDto>> verHistorial(Authentication authentication){
+        String usuarioUuid = (String) authentication.getPrincipal();
+        return ResponseEntity.ok(pedidoService.obtenerHistorial(usuarioUuid));
+    }
+
     @PostMapping("/carrito/pagar")
     @Operation(summary = "Pagar y finalizar compra")
     public ResponseEntity<PedidoResponseDto> pagarCarrito(Authentication authentication) {
         String usuarioUuid = (String) authentication.getPrincipal();
         return ResponseEntity.ok(pedidoService.pagarCarrito(usuarioUuid));
+    }
+
+    @PostMapping("/comprar")
+    @Operation(summary = "Comprar un producto directamente")
+    public ResponseEntity<PedidoResponseDto> comprarProducto(
+        @Valid @RequestBody AgregarItemDto dto,
+        Authentication authentication
+    ){
+        String usuarioUuid = (String) authentication.getPrincipal();
+        return ResponseEntity.ok(pedidoService.comprarArticuloDirecto(usuarioUuid, dto));
     }
 
     @DeleteMapping("/carrito/{sku}")

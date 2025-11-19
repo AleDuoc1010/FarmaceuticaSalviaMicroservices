@@ -12,6 +12,7 @@ public record ProductoResponseDto(
     BigDecimal precio,
     String imagenUrl,
     boolean destacado,
+    boolean pideReceta,
     LocalDateTime fechaCreacion
 
 ) {}

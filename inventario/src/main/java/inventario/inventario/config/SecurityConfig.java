@@ -38,6 +38,7 @@ public class SecurityConfig {
 
                 .requestMatchers(HttpMethod.POST, "/inventario").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.PUT, "/inventario/**").authenticated()
+                .requestMatchers("/error").permitAll()
 
                 .anyRequest().authenticated()
             )

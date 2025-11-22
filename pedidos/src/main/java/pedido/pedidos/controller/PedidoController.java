@@ -72,6 +72,16 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.comprarArticuloDirecto(usuarioUuid, dto));
     }
 
+    @PutMapping("/carrito/{sku}")
+    public ResponseEntity<PedidoResponseDto> modificarCantidad(
+            @PathVariable String sku,
+            @RequestParam Integer cantidad,
+            Authentication authentication
+    ) {
+        String usuarioUuid = (String) authentication.getPrincipal();
+        return ResponseEntity.ok(pedidoService.modificarCantidad(usuarioUuid, sku, cantidad));
+    }
+
     @DeleteMapping("/carrito/{sku}")
     @Operation(summary = "Eliminar un producto del carrito")
     public ResponseEntity<Void> eliminarItem(
@@ -80,6 +90,30 @@ public class PedidoController {
     ){
         String usuarioUuid = (String) authentication.getPrincipal();
         pedidoService.eliminarItem(usuarioUuid, sku);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/carrito")
+    public ResponseEntity<Void> vaciarCarrito(Authentication authentication) {
+        String usuarioUuid = (String) authentication.getPrincipal();
+        pedidoService.vaciarCarrito(usuarioUuid);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/historial/{id}")
+    public ResponseEntity<Void> eliminarPedidoHistorial(
+            @PathVariable Long id, 
+            Authentication authentication
+    ) {
+        String usuarioUuid = (String) authentication.getPrincipal();
+        pedidoService.eliminarPedidoHistorial(usuarioUuid, id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/historial")
+    public ResponseEntity<Void> borrarHistorial(Authentication authentication) {
+        String usuarioUuid = (String) authentication.getPrincipal();
+        pedidoService.borrarHistorialCompleto(usuarioUuid);
         return ResponseEntity.noContent().build();
     }
     

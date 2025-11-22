@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/productos").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.DELETE, "/productos/**").hasRole("ADMINISTRADOR")
                 .requestMatchers("/imagenes/**").permitAll()
+                .requestMatchers("/error").permitAll()
 
                 .anyRequest().authenticated()
             )

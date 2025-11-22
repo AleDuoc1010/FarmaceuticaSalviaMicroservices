@@ -48,18 +48,21 @@ public class PedidoService {
 
         ProductoExternoDto productoInfo = catalogoClient.getProductoBySku(dto.sku());
 
-        InventarioExternoDto stockInfo = inventarioClient.obtenerStock(dto.sku());
-        if(stockInfo.cantidad() < dto.cantidad()){
-            throw new StockInsuficienteException("Stock insuficiente. Disponible: " + stockInfo.cantidad());
-        }
-
         Optional<ItemsPedido> itemExistente = pedido.getItems().stream()
         .filter(i -> i.getSkuProducto().equals(dto.sku()))
         .findFirst();
 
+        int cantidadActualEnCarrito = itemExistente.map(ItemsPedido::getCantidad).orElse(0);
+        int cantidadTotalDeseada = cantidadActualEnCarrito + dto.cantidad();
+
+        InventarioExternoDto stockInfo = inventarioClient.obtenerStock(dto.sku());
+        if(stockInfo.cantidad() < cantidadTotalDeseada){
+            throw new StockInsuficienteException("Stock insuficiente.");
+        }
+
         if (itemExistente.isPresent()){
             ItemsPedido item = itemExistente.get();
-            item.setCantidad(item.getCantidad() + dto.cantidad());
+            item.setCantidad(cantidadTotalDeseada);
         }else{
             ItemsPedido nuevoItem = new ItemsPedido();
             nuevoItem.setPedido(pedido);
@@ -73,6 +76,42 @@ public class PedidoService {
         Pedido pedidoGuardado = pedidoRepository.save(pedido);
 
         return mapToDto(pedidoGuardado);
+    }
+
+    @Transactional
+    public PedidoResponseDto modificarCantidad(String usuarioUuid, String sku, Integer nuevaCantidad){
+        Pedido pedido = pedidoRepository.findByUsuarioUuidAndEstado(usuarioUuid, Estado.PENDIENTE)
+        .orElseThrow(() -> new PedidoNotFoundException("No hay carrito activo"));
+
+        if (nuevaCantidad <= 0) {
+            eliminarItem(usuarioUuid, sku);
+            return obtenerCarrito(usuarioUuid);
+        }
+
+        InventarioExternoDto stockInfo = inventarioClient.obtenerStock(sku);
+        if (stockInfo.cantidad() < nuevaCantidad){
+            throw new StockInsuficienteException("Stock insuficiente. Solo hay "+ stockInfo.cantidad() + " disponibles.");
+        }
+
+        ItemsPedido item = pedido.getItems().stream()
+            .filter(i -> i.getSkuProducto(). equals(sku))
+            .findFirst()
+            .orElseThrow(() -> new PedidoNotFoundException("El producto no está en el carrito"));
+
+        item.setCantidad(nuevaCantidad);
+
+        calcularTotal(pedido);
+        return mapToDto(pedidoRepository.save(pedido));
+    }
+
+    @Transactional
+    public void vaciarCarrito(String usuarioUuid) {
+        Pedido pedido = pedidoRepository.findByUsuarioUuidAndEstado(usuarioUuid, Estado.PENDIENTE)
+                .orElseThrow(() -> new PedidoNotFoundException("No hay carrito activo"));
+        
+        pedido.getItems().clear();
+        pedido.setMontoTotal(BigDecimal.ZERO);
+        pedidoRepository.save(pedido);
     }
 
     @Transactional(readOnly = true)
@@ -153,6 +192,29 @@ public class PedidoService {
             calcularTotal(pedido);
             pedidoRepository.save(pedido);
         }
+    }
+
+    @Transactional
+    public void eliminarPedidoHistorial(String usuarioUuid, Long pedidoId) {
+
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new PedidoNotFoundException("Pedido no encontrado"));
+
+        if (!pedido.getUsuarioUuid().equals(usuarioUuid)) {
+            throw new RuntimeException("No tienes permiso para eliminar este pedido");
+        }
+
+        if (pedido.getEstado() != Estado.PAGADO) {
+            throw new RuntimeException("Solo se pueden eliminar pedidos del historial (Pagados)");
+        }
+
+        pedidoRepository.delete(pedido);
+    }
+
+    @Transactional
+    public void borrarHistorialCompleto(String usuarioUuid) {
+        List<Pedido> historial = pedidoRepository.findAllByUsuarioUuidAndEstado(usuarioUuid, Estado.PAGADO);
+        pedidoRepository.deleteAll(historial);
     }
 
     private void calcularTotal(Pedido pedido){

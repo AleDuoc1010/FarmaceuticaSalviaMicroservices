@@ -55,7 +55,7 @@ public class ProductoController {
     @Operation(summary = "Buscar productos por nombre", description = "Busca productos cuyo nombre contenga el texto especificado")
     @ApiResponse(responseCode = "200", description = "Productos encontrados exitosamente")
     @GetMapping("/nombre")
-    public ResponseEntity<Page<ProductoResponseDto>> buscarPorNombre(@RequestParam String nombre, Pageable pageable){
+    public ResponseEntity<Page<ProductoResponseDto>> buscarPorNombre(@RequestParam String nombre, @ParameterObject Pageable pageable){
         Page<ProductoResponseDto> pagina = productoService.findByNombre(nombre, pageable);
         return ResponseEntity.ok(pagina);
     }

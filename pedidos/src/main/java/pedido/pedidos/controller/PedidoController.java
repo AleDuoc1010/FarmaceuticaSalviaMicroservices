@@ -73,6 +73,7 @@ public class PedidoController {
     }
 
     @PutMapping("/carrito/{sku}")
+    @Operation(summary = "Modificar cantidad en carrito")
     public ResponseEntity<PedidoResponseDto> modificarCantidad(
             @PathVariable String sku,
             @RequestParam Integer cantidad,
@@ -94,6 +95,7 @@ public class PedidoController {
     }
 
     @DeleteMapping("/carrito")
+    @Operation(summary = "Vaciar Carrito")
     public ResponseEntity<Void> vaciarCarrito(Authentication authentication) {
         String usuarioUuid = (String) authentication.getPrincipal();
         pedidoService.vaciarCarrito(usuarioUuid);
@@ -101,6 +103,7 @@ public class PedidoController {
     }
 
     @DeleteMapping("/historial/{id}")
+    @Operation(summary = "Eliminar registro de historial")
     public ResponseEntity<Void> eliminarPedidoHistorial(
             @PathVariable Long id, 
             Authentication authentication
@@ -111,6 +114,7 @@ public class PedidoController {
     }
 
     @DeleteMapping("/historial")
+    @Operation(summary = "Borrar historial")
     public ResponseEntity<Void> borrarHistorial(Authentication authentication) {
         String usuarioUuid = (String) authentication.getPrincipal();
         pedidoService.borrarHistorialCompleto(usuarioUuid);

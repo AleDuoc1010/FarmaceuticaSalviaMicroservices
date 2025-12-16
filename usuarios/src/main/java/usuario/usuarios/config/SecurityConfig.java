@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/usuarios/**").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.GET, "/usuarios").hasRole("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.PATCH, "/usuarios/*/rol").hasRole("ADMINISTRADOR")
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             )
@@ -57,7 +58,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
 
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

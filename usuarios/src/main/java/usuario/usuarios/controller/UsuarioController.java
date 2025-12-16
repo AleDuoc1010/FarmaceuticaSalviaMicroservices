@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import usuario.usuarios.dto.LoginDto;
 import usuario.usuarios.dto.LoginResponseDto;
 import usuario.usuarios.dto.RegistroDto;
+import usuario.usuarios.dto.RolUpdateDto;
 import usuario.usuarios.dto.UsuarioResponseDto;
 import usuario.usuarios.model.Usuario;
 import usuario.usuarios.service.UsuarioService;
@@ -22,6 +23,7 @@ import usuario.usuarios.security.JwtTokenProvider;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -89,6 +91,15 @@ public class UsuarioController {
 
         Page<UsuarioResponseDto> paginaDto = paginaUsuarios.map(this::mapToUsuarioResponseDto);
         return ResponseEntity.ok(paginaDto);
+    }
+
+    @PatchMapping("/{uuid}/rol")
+    public ResponseEntity<Usuario> actualizarRol(
+        @PathVariable String uuid,
+        @RequestBody RolUpdateDto dto
+    ){
+        Usuario usuarioActualizado = usuarioService.cambiarRol(uuid, dto.nuevoRol());
+        return ResponseEntity.ok(usuarioActualizado);
     }
 
     @Operation(summary = "Eliminar un usuario por UUID")

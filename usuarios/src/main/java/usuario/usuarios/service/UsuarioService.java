@@ -73,6 +73,20 @@ public class UsuarioService {
         }
     }
 
+    public Usuario cambiarRol(String uuid, String nuevoRolStr) {
+        Usuario usuario = usuarioRepository.findByUuid(uuid)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        try {
+            Rol rolEnum = Rol.valueOf(nuevoRolStr.toUpperCase());
+            usuario.setRol(rolEnum);
+        } catch (IllegalArgumentException e){
+            throw new RuntimeException("Rol no válido. Use 'ADMINISTRADOR' O 'USUARIO'");
+        }
+
+        return usuarioRepository.save(usuario);
+   }
+
 
     @Transactional
     public void eliminarUsuarioPorUuid(String uuid) {

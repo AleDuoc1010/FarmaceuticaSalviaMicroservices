@@ -93,6 +93,8 @@ public class UsuarioController {
         return ResponseEntity.ok(paginaDto);
     }
 
+    @Operation(summary = "Actualizar el rol de un usuario")
+    @ApiResponse(responseCode = "200", description = "Rol actualizado exitosamente")
     @PatchMapping("/{uuid}/rol")
     public ResponseEntity<Usuario> actualizarRol(
         @PathVariable String uuid,
